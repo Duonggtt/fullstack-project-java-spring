@@ -7,7 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import static javax.persistence.FetchType.EAGER;
 
 @Entity
 @NoArgsConstructor
@@ -23,14 +27,15 @@ public class Clazz {
     @Column(name = "class_name")
     private String className;
 
-    @Column(name = "course_num")
-    private Integer courseNum;
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
 
-    @Column(name = "advisor_name")
-    private String advisorName;
+    @ManyToOne
+    @JoinColumn(name = "academic_year_id")
+    private AcademicYear academicYear;
 
-    @Column(name = "monitor_name")
-    private String monitorName;
-
+    @ManyToMany(fetch = EAGER)
+    private Collection<Advisor> advisors = new ArrayList<>();
 
 }

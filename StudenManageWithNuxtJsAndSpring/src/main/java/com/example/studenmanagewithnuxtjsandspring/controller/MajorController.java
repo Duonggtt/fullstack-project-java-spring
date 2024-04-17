@@ -1,6 +1,6 @@
 package com.example.studenmanagewithnuxtjsandspring.controller;
 
-import com.example.studenmanagewithnuxtjsandspring.model.request.UpsertMajorRequest;
+import com.example.studenmanagewithnuxtjsandspring.entity.Major;
 import com.example.studenmanagewithnuxtjsandspring.service.MajorService;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -26,13 +26,18 @@ public class MajorController {
         return ResponseEntity.ok(majorService.getAllMajors(page, limit , sortField, sortDirection));
     }
 
+    @GetMapping("/list")
+    public ResponseEntity<?> getMajors() {
+        return ResponseEntity.ok(majorService.getMajors());
+    }
+
     @PostMapping("/create")
-    public ResponseEntity<?> createMajor(@Valid @RequestBody UpsertMajorRequest request) {
+    public ResponseEntity<?> createMajor(@Valid @RequestBody Major request) {
         return new ResponseEntity<>(majorService.createMajor(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateMajor(@PathVariable Integer id,@Valid @RequestBody UpsertMajorRequest request) {
+    public ResponseEntity<?> updateMajor(@PathVariable Integer id,@Valid @RequestBody Major request) {
         return new ResponseEntity<>(majorService.updateMajor(request,id), HttpStatus.CREATED);
     }
 

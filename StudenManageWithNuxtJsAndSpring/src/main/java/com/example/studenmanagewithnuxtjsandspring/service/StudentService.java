@@ -1,13 +1,9 @@
 package com.example.studenmanagewithnuxtjsandspring.service;
 
-import com.example.studenmanagewithnuxtjsandspring.entity.Clazz;
-import com.example.studenmanagewithnuxtjsandspring.entity.Major;
-import com.example.studenmanagewithnuxtjsandspring.entity.Student;
+import com.example.studenmanagewithnuxtjsandspring.entity.*;
 import com.example.studenmanagewithnuxtjsandspring.exception.NotFoundException;
 import com.example.studenmanagewithnuxtjsandspring.model.request.UpsertStudentRequest;
-import com.example.studenmanagewithnuxtjsandspring.repository.ClazzRepository;
-import com.example.studenmanagewithnuxtjsandspring.repository.MajorRepository;
-import com.example.studenmanagewithnuxtjsandspring.repository.StudentRepository;
+import com.example.studenmanagewithnuxtjsandspring.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -25,6 +21,12 @@ public class StudentService {
 
     @Autowired
     private MajorRepository majorRepository;
+
+    @Autowired
+    private SubjectRepository subjectRepository;
+
+    @Autowired
+    private GenderRepository genderRepository;
 
     public Page<Student> getAllStudents(Integer page, Integer limit , String sortField, String sortDirection) {
         Sort sort = Sort.by(sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortField);
@@ -53,29 +55,28 @@ public class StudentService {
     }
 
     public Student createStudent(UpsertStudentRequest request) {
+
+        Gender gender = genderRepository.findById(request.getGenderId())
+                .orElseThrow(() -> new NotFoundException("Gender not found with id = " + request.getGenderId()));
+
+        Major major = majorRepository.findById(request.getMajorId())
+                .orElseThrow(() -> new NotFoundException("Major not found with id = " + request.getMajorId()));
+
+        Clazz clazz = clazzRepository.findById(request.getClazzId())
+                .orElseThrow(() -> new NotFoundException("Clazz not found with id = " + request.getClazzId()));
+
         Student student = new Student();
         student.setFullName(request.getFullName());
         student.setBirthDate(request.getBirthDate());
         student.setAddress(request.getAddress());
-        student.setAdmissionDate(request.getAdmissionDate());
-        student.setGraduationDate(request.getGraduationDate());
-        student.setGender(request.getGender());
         student.setEmail(request.getEmail());
         student.setPhone(request.getPhone());
+        student.setCmnd(request.getCmnd());
         student.setEthnicity(request.getEthnicity());
-        student.setGpa(4);
         student.setStatus("Đang học");
-        if (request.getMajorId() != null) {
-            Major major = majorRepository.findById(request.getMajorId())
-                    .orElseThrow(() -> new NotFoundException("Major not found with id = " + request.getMajorId()));
-            student.setMajor(major);
-        }
-
-        if (request.getClazzId() != null) {
-            Clazz clazz = clazzRepository.findById(request.getClazzId())
-                    .orElseThrow(() -> new NotFoundException("Clazz not found with id = " + request.getClazzId()));
-            student.setClazz(clazz);
-        }
+        student.setGender(gender);
+        student.setMajor(major);
+        student.setClazz(clazz);
         studentRepository.save(student);
 
         return student;
@@ -84,22 +85,25 @@ public class StudentService {
         public Student updateStudent(UpsertStudentRequest request, Integer id) {
             Student student = studentRepository.findById(id)
                     .orElseThrow(() -> new NotFoundException("Student not found with id = " + id));
-            Clazz clazz = clazzRepository.findById(request.getClazzId())
-                    .orElseThrow(() -> new NotFoundException("Clazz not found with id = " + request.getClazzId()));
+
+            Gender gender = genderRepository.findById(request.getGenderId())
+                    .orElseThrow(() -> new NotFoundException("Gender not found with id = " + request.getGenderId()));
+
             Major major = majorRepository.findById(request.getMajorId())
                     .orElseThrow(() -> new NotFoundException("Major not found with id = " + request.getMajorId()));
+
+            Clazz clazz = clazzRepository.findById(request.getClazzId())
+                    .orElseThrow(() -> new NotFoundException("Clazz not found with id = " + request.getClazzId()));
 
             student.setFullName(request.getFullName());
             student.setBirthDate(request.getBirthDate());
             student.setAddress(request.getAddress());
-            student.setAdmissionDate(request.getAdmissionDate());
-            student.setGraduationDate(request.getGraduationDate());
-            student.setGender(request.getGender());
             student.setEmail(request.getEmail());
             student.setPhone(request.getPhone());
+            student.setCmnd(request.getCmnd());
             student.setEthnicity(request.getEthnicity());
-            student.setGpa(request.getGpa());
             student.setStatus(request.getStatus());
+            student.setGender(gender);
             student.setMajor(major);
             student.setClazz(clazz);
             studentRepository.save(student);

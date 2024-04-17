@@ -1,20 +1,17 @@
 package com.example.studenmanagewithnuxtjsandspring.repository;
 
 import com.example.studenmanagewithnuxtjsandspring.entity.Student;
+import com.example.studenmanagewithnuxtjsandspring.entity.Subject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface StudentRepository extends JpaRepository<Student, Integer> {
-
-    List<Student> findByIdIn(List<Integer> categoryIds);
-    @Query("select  s from Student s where "
-            + "concat(s.id, s.fullName, s.cmnd)"
+public interface SubjectRepository extends JpaRepository<Subject , Integer> {
+    @Query("select  s from Subject s where "
+            + "concat(s.id, s.name)"
             + "LIKE %?1%")
-    Page<Student> findAll(String keyword, Pageable pageable);
+    Page<Subject> findAll(String keyword, Pageable pageable);
 }

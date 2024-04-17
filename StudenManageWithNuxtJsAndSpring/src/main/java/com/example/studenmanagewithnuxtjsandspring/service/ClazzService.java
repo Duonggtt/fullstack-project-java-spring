@@ -1,10 +1,12 @@
 package com.example.studenmanagewithnuxtjsandspring.service;
 
+import com.example.studenmanagewithnuxtjsandspring.entity.AcademicYear;
+import com.example.studenmanagewithnuxtjsandspring.entity.Advisor;
 import com.example.studenmanagewithnuxtjsandspring.entity.Clazz;
+import com.example.studenmanagewithnuxtjsandspring.entity.Course;
 import com.example.studenmanagewithnuxtjsandspring.exception.NotFoundException;
 import com.example.studenmanagewithnuxtjsandspring.model.request.UpsertClazzRequest;
-import com.example.studenmanagewithnuxtjsandspring.repository.ClazzRepository;
-import com.example.studenmanagewithnuxtjsandspring.repository.StudentRepository;
+import com.example.studenmanagewithnuxtjsandspring.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -18,7 +20,16 @@ public class ClazzService {
     private ClazzRepository clazzRepository;
 
     @Autowired
-    private StudentRepository studentRepository;
+    private CourseRepository courseRepository;
+
+    @Autowired
+    private AcademicYearRepository academicYearRepository;
+
+    @Autowired
+    private AdvisorRepository advisorRepository;
+
+
+
     public Page<Clazz> getAllClazzs(Integer page, Integer limit , String sortField, String sortDirection) {
         Sort sort = Sort.by(sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortField);
         PageRequest pageRequest = PageRequest.of(page - 1, limit, sort);
@@ -46,24 +57,39 @@ public class ClazzService {
     }
 
     public Clazz createClazz(UpsertClazzRequest request) {
-        Clazz clazz = new Clazz();
 
+        Course course = courseRepository.findById(request.getCourseId())
+                .orElseThrow(() -> new NotFoundException("Course not found with id = " + request.getCourseId()));
+
+        AcademicYear academicYear = academicYearRepository.findById(request.getAcademicYearId())
+                .orElseThrow(() -> new NotFoundException("AcademicYear not found with id = " + request.getAcademicYearId()));
+
+        List<Advisor> advisors = advisorRepository.findAllById(request.getAdvisorIds());
+
+        Clazz clazz = new Clazz();
         clazz.setClassName(request.getClassName());
-        clazz.setCourseNum(request.getCourseNum());
-        clazz.setAdvisorName(request.getAdvisorName());
-        clazz.setMonitorName(request.getMonitorName());
+        clazz.setCourse(course);
+        clazz.setAcademicYear(academicYear);
+        clazz.setAdvisors(advisors);
         clazzRepository.save(clazz);
         return clazz;
     }
 
     public Clazz updateClazz(Integer id, UpsertClazzRequest request) {
+        Course course = courseRepository.findById(request.getCourseId())
+                .orElseThrow(() -> new NotFoundException("Course not found with id = " + request.getCourseId()));
+
+        AcademicYear academicYear = academicYearRepository.findById(request.getAcademicYearId())
+                .orElseThrow(() -> new NotFoundException("AcademicYear not found with id = " + request.getAcademicYearId()));
+
+        List<Advisor> advisors = advisorRepository.findAllById(request.getAdvisorIds());
+
         Clazz clazz = clazzRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Clazz not found with id = " + id));
-
         clazz.setClassName(request.getClassName());
-        clazz.setCourseNum(request.getCourseNum());
-        clazz.setAdvisorName(request.getAdvisorName());
-        clazz.setMonitorName(request.getMonitorName());
+        clazz.setCourse(course);
+        clazz.setAcademicYear(academicYear);
+        clazz.setAdvisors(advisors);
         clazzRepository.save(clazz);
         return clazz;
     }

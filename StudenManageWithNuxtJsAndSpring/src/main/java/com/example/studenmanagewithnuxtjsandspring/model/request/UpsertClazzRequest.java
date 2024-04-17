@@ -12,7 +12,7 @@ import java.util.List;
 @ToString
 public class UpsertClazzRequest {
     private String className;
-    private Integer courseNum;
-    private String advisorName;
-    private String monitorName;
+    private Integer courseId;
+    private Integer academicYearId;
+    private List<Integer> advisorIds;
 }

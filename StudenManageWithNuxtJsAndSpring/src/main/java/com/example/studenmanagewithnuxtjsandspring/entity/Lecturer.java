@@ -8,8 +8,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.List;
 
 import static javax.persistence.FetchType.EAGER;
 
@@ -18,32 +16,25 @@ import static javax.persistence.FetchType.EAGER;
 @Getter
 @Setter
 @AllArgsConstructor
-@Table(name = "student")
-public class Student {
+@Table(name = "lecturer")
+public class Lecturer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @Column(name = "full_name")
     private String fullName;
-    @Column(name = "birth_date")
-    private Date birthDate;
-    private String address;
+
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "phone")
     private String phone;
-    private String cmnd;
-    private String ethnicity;
-    private String status;
 
     @ManyToOne
     @JoinColumn(name = "gender_id")
     private Gender gender;
 
-    @ManyToOne
-    @JoinColumn(name = "major_id")
-    private Major major;
-
-    @ManyToOne
-    @JoinColumn(name = "clazz_id")
-    private Clazz clazz;
-
+    @ManyToMany(fetch = EAGER)
+    private Collection<Subject> subjects = new ArrayList<>();
 }

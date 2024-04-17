@@ -2,7 +2,6 @@ package com.example.studenmanagewithnuxtjsandspring.service;
 
 import com.example.studenmanagewithnuxtjsandspring.entity.Major;
 import com.example.studenmanagewithnuxtjsandspring.exception.NotFoundException;
-import com.example.studenmanagewithnuxtjsandspring.model.request.UpsertMajorRequest;
 import com.example.studenmanagewithnuxtjsandspring.repository.MajorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -41,7 +40,7 @@ public class MajorService {
         return sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
     }
 
-    public Major createMajor(UpsertMajorRequest request) {
+    public Major createMajor(Major request) {
         Major major = new Major();
         major.setMajorName(request.getMajorName());
         major.setDetail(request.getDetail());
@@ -50,7 +49,7 @@ public class MajorService {
         return major;
     }
 
-    public Major updateMajor(UpsertMajorRequest request, Integer id) {
+    public Major updateMajor(Major request, Integer id) {
         Major major = majorRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Major not found with id = " + id));
 
@@ -71,5 +70,9 @@ public class MajorService {
     public Major getMajorById(Integer id) {
         return majorRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Major not found with id = " + id));
+    }
+
+    public List<Major> getMajors() {
+        return majorRepository.findAll();
     }
 }

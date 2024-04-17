@@ -7,8 +7,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class UpsertMajorRequest {
-    private String majorName;
-    private String detail;
-    private Integer yearQuantity;
+public class UpsertAdvisorRequest {
+    private String name;
+    private String email;
+    private String phone;
+    private Integer genderId;
 }
