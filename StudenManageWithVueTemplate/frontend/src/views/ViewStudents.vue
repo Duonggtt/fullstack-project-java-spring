@@ -67,7 +67,7 @@
                                           <td>
                                             {{ student.major ? student.major.majorName : 'Chưa chọn ngành' }}
                                           </td>
-                                          <td>{{ student.gender }}</td>
+                                          <td>{{ student.gender.genderName }}</td>
                                           <td :class="{ 'text-danger': !student.clazz, 'text-success': student.clazz }">
                                             {{ student.clazz ? student.clazz.className : 'Chưa có lớp' }}
                                         </td>
@@ -133,7 +133,7 @@ import { useAuthStore } from '../stores/auth';
                 currentPage: 1,
                 totalPages: 1,
                 pageSize: 10,
-                students: []
+                students: [],
             }
         },
 

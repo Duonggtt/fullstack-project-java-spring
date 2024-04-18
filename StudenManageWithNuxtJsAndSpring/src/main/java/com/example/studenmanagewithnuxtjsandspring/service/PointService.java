@@ -44,6 +44,7 @@ public class PointService {
         return point;
     }
 
+
     public Point updatePoint(UpsertPointRequest request, Integer id) {
         Point point = pointRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Point not found with id = " + id));
