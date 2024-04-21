@@ -1,10 +1,12 @@
 package com.example.studenmanagewithnuxtjsandspring.service;
 
+import com.example.studenmanagewithnuxtjsandspring.entity.GradeScale;
 import com.example.studenmanagewithnuxtjsandspring.entity.Point;
 import com.example.studenmanagewithnuxtjsandspring.entity.Student;
 import com.example.studenmanagewithnuxtjsandspring.entity.Subject;
 import com.example.studenmanagewithnuxtjsandspring.exception.NotFoundException;
 import com.example.studenmanagewithnuxtjsandspring.model.request.UpsertPointRequest;
+import com.example.studenmanagewithnuxtjsandspring.repository.GradeScaleRepository;
 import com.example.studenmanagewithnuxtjsandspring.repository.PointRepository;
 import com.example.studenmanagewithnuxtjsandspring.repository.StudentRepository;
 import com.example.studenmanagewithnuxtjsandspring.repository.SubjectRepository;
@@ -25,6 +27,9 @@ public class PointService {
     @Autowired
     private SubjectRepository subjectRepository;
 
+    @Autowired
+    private GradeScaleRepository gradeScaleRepository;
+
     public Point createPoint(UpsertPointRequest request) {
         Student student = studentRepository.findById(request.getStudentId())
                 .orElseThrow(() -> new NotFoundException("Student not found with id = " + request.getStudentId()));
@@ -32,12 +37,18 @@ public class PointService {
         Subject subject = subjectRepository.findById(request.getSubjectId())
                 .orElseThrow(() -> new NotFoundException("Subject not found with id = " + request.getSubjectId()));
 
+
         Point point = new Point();
         point.setDiligencePoint(request.getDiligencePoint());
         point.setMidTermPoint(request.getMidTermPoint());
         point.setFinalPoint(request.getFinalPoint());
         point.setStatus(request.getStatus());
-        point.setGpa((request.getDiligencePoint() + request.getMidTermPoint() * 2 + request.getFinalPoint() * 7) / 9);
+        float gpa = (request.getDiligencePoint() + request.getMidTermPoint() * 2 + request.getFinalPoint() * 7) / 9;
+        point.setGpa(gpa);
+        GradeScale gradeScale = gradeScaleRepository.findGradeScaleByGpaRange(gpa)
+                .orElseThrow(() -> new NotFoundException("No GradeScale found for gpa = " + gpa));
+        point.setGradeScale(gradeScale);
+
         point.setStudent(student);
         point.setSubject(subject);
         pointRepository.save(point);
@@ -58,7 +69,13 @@ public class PointService {
         point.setMidTermPoint(request.getMidTermPoint());
         point.setFinalPoint(request.getFinalPoint());
         point.setStatus(request.getStatus());
-        point.setGpa((request.getDiligencePoint() + request.getMidTermPoint() * 2 + request.getFinalPoint() * 7) / 9);
+        float gpa = (request.getDiligencePoint() + request.getMidTermPoint() * 2 + request.getFinalPoint() * 7) / 9;
+        point.setGpa(gpa);
+
+        GradeScale gradeScale = gradeScaleRepository.findGradeScaleByGpaRange(gpa)
+                .orElseThrow(() -> new NotFoundException("No GradeScale found for gpa = " + gpa));
+        point.setGradeScale(gradeScale);
+
         point.setStudent(student);
         point.setSubject(subject);
         pointRepository.save(point);

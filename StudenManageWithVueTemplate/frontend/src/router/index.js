@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import ViewStudents from '../views/ViewStudents.vue'
 import ViewMajors from '../views/ViewMajors.vue'
 import ViewClazzs from '../views/ViewClazzs.vue'
+import ViewStudentPoints from '../views/ViewStudentPoints.vue'
 
 import AddStudent from '../views/AddStudent.vue'
 import AddMajor from '../views/AddMajor.vue'
@@ -75,6 +76,13 @@ const router = createRouter({
       name: 'UpdateClazz',
       component: UpdateClazz
     },
+
+    //point
+    {
+      path: '/student/:id/points',
+      name: 'ViewStudentPoints',
+      component: ViewStudentPoints
+    }
 
 
   ]

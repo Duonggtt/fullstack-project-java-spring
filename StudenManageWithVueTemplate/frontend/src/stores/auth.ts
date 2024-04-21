@@ -41,8 +41,8 @@ export const useAuthStore = defineStore({
 
             if(response.status === 200) {
                 const { access_token, refresh_token } = await response.json(); 
-                console.log(access_token);
-                console.log(refresh_token);
+                console.log("access_token", access_token);
+                console.log("refresh_token",refresh_token);
                 localStorage.setItem('user', username);
                 localStorage.setItem('access_token', access_token);
                 localStorage.setItem('refresh_token', refresh_token);

@@ -47,14 +47,13 @@
                               <table class="table table-bordered table-hover">
                                   <thead>
                                       <tr>
-                                          <th>ID</th>
-                                          <th>Tên sinh viên</th>
-                                          <th>Ngày sinh</th>
-                                          <th>Địa chỉ</th>
-                                          <th>Ngành học</th>
-                                          <th>Giới tính</th>
-                                          <th>Lớp</th>
-                                          <th>Trạng thái</th>
+                                          <th>Mã môn học</th>
+                                          <th>Tên môn học</th>
+                                          <th>Điểm chuyên cần</th>
+                                          <th>Điểm giữa kì</th>
+                                          <th>Điểm cuối kì</th>
+                                          <th>Gpa</th>
+                                          <th>Tổng kết</th>
                                           <th>Thao tác</th>
                                       </tr>
                                   </thead>
@@ -71,16 +70,10 @@
                                           <td :class="{ 'text-danger': !student.clazz, 'text-success': student.clazz }">
                                             {{ student.clazz ? student.clazz.className : 'Chưa có lớp' }}
                                         </td>
-                                        <td>
-                                            <p :class="getStatusColor(student.status)">{{ student.status }}</p>
-                                        </td>
 
                                           <td>
                                               <a :href="`/student/update/${student.id}`" type="button" class="btn btn-success">
                                                   <i class="fas fa-search"></i>
-                                              </a>
-                                              <a  @click="deleteStudent(student.id)" type="button" class="btn btn-success" style="background-color: tomato;margin-left: 10px;" >
-                                                  <i class="fas fa-trash"></i>
                                               </a>
                                           </td>
                                       </tr>

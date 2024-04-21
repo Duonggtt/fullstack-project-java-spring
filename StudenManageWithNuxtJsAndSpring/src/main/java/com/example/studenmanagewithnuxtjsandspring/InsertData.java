@@ -17,6 +17,19 @@ public class InsertData {
         genderService.createGender(female);
     }
 
+    public void addGradeScale(GradeScaleService gradeScaleService) {
+        GradeScale gradeScaleA = new GradeScale(null,"A",9.0f,10.0f);
+        GradeScale gradeScaleB = new GradeScale(null,"B",8.5f,9.0f);
+        GradeScale gradeScaleC = new GradeScale(null,"C",7.0f,8.5f);
+        GradeScale gradeScaleD = new GradeScale(null,"D",5.5f,7.0f);
+        GradeScale gradeScaleF = new GradeScale(null,"F",0.0f,5.5f);
+        gradeScaleService.createGrade(gradeScaleA);
+        gradeScaleService.createGrade(gradeScaleB);
+        gradeScaleService.createGrade(gradeScaleC);
+        gradeScaleService.createGrade(gradeScaleD);
+        gradeScaleService.createGrade(gradeScaleF);
+    }
+
     public void addAdvisors(AdvisorService advisorService) {
         //add advisor co van
         UpsertAdvisorRequest advisor = new UpsertAdvisorRequest("Nguyễn Văn A","a123@gmail.com","1234567890",1);

@@ -38,4 +38,8 @@ public class Point {
     @OneToOne
     @JoinColumn(name = "subject_id")
     private Subject subject;
+
+    @OneToOne
+    @JoinColumn(name = "grade_scale_id")
+    private GradeScale gradeScale;
 }

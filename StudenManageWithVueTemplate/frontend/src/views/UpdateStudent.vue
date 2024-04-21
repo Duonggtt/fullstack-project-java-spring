@@ -17,12 +17,12 @@
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0">Thêm mới ngành học</h1>
+              <h1 class="m-0">Chi tiết sinh viên</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="/">Home</a></li>
-                <li class="breadcrumb-item active">Thêm mới sinh viên</li>
+                <li class="breadcrumb-item active">Chi tiết sinh viên</li>
               </ol>
             </div><!-- /.col -->
           </div><!-- /.row -->
@@ -35,8 +35,12 @@
         <div class="container-fluid">
             <div class="row py-2">
                 <div class="col-12">
-                    <a :href="`/student/update/${student.id}`" type="button" class="btn btn-info">
+                    <a :href="`/student/update/${student.id}`" type="button" class="btn btn-info" style="margin-right: 10px;">
                         <i class="fas fa-redo"></i> Refresh
+                    </a>
+
+                    <a :href="`/student/${student.id}/points`" type="button" class="btn btn-warning">
+                      <i class="fas fa-search"></i> Xem điểm
                     </a>
                 </div>
             </div>
@@ -50,6 +54,13 @@
                               <!--id-->
                               <div class="row">
                                 <div class="col-md-12 form-group mb-3">
+                                    <label for="studentId" class="form-label">Mã sinh viên</label>
+                                    <input id="studentId" disabled type="text" name="studentId" class="form-control" placeholder="Mã sinh viên" required v-model="student.id">
+                                </div>
+                              </div>
+
+                              <div class="row">
+                                <div class="col-md-12 form-group mb-3">
                                     <label for="fullName" class="form-label">Họ tên sinh viên</label>
                                     <input id="fullName"  type="text" name="fullName" class="form-control" placeholder="Họ tên đầy đủ của sinh viên" required v-model="student.fullName">
                                 </div>
@@ -58,7 +69,7 @@
                               <div class="row">
                                 <div class="col-md-12 form-group mb-3">
                                     <label for="birthDate" class="form-label">Ngày sinh</label>
-                                    <input type="date" name="birthDate" class="form-control" id="birthDate" v-model="student.birthDate">
+                                    <input type="date" name="birthDate" class="form-control" id="birthDate" required v-model="student.birthDate">
                                 </div>
                               </div>
 
@@ -71,78 +82,79 @@
 
                               <div class="row">
                                 <div class="col-md-12 form-group mb-3">
-                                    <label for="admissionDate" class="form-label">Thời gian nhập học</label>
-                                    <input type="date" name="admissionDate" class="form-control" id="admissionDate" v-model="student.admissionDate">
+                                    <label for="cmnd" class="form-label">Số căn cước công dân</label>
+                                    <input type="text" name="cmnd" class="form-control" id="cmnd" required v-model="student.cmnd">
                                 </div>
                               </div>
 
                               <div class="row">
                                 <div class="col-md-12 form-group mb-3">
-                                    <label for="graduationDate" class="form-label">Thời gian tốt nghiệp</label>
-                                    <input type="date" name="graduationDate" class="form-control" id="graduationDate" v-model="student.graduationDate">
+                                  <label for="gender" class="form-label">Giới tính</label>
+                                  <select id="gender" name="gender" class="form-control" required v-model="student.genderId">
+                                    <option value="">-- Chọn giới tính --</option>
+                                    <option v-for="gender in genders" :value="gender.id" :key="gender.id">
+                                      {{ gender.genderName }}
+                                    </option>
+                                  </select>
                                 </div>
                               </div>
 
                               <div class="row">
                                 <div class="col-md-12 form-group mb-3">
-                                    <label for="gender" class="form-label">Giới tính</label>
-                                    <input id="gender"  type="text" name="gender" class="form-control" placeholder="giới tính" required v-model="student.gender">
-                                </div>
-                              </div>
-
-                              <div class="row">
-                                <label for="clazz" class="form-label">Lớp</label>
-                                <div class="col-md-11 form-group mb-3 d-flex justify-content-between">
-                                  <div class="input-group col-md-3">
-                                    <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search" v-model="searchClazzId">
-                                    <div class="input-group-append" style="background-color: antiquewhite;border-radius: 5px; margin-right: 10px;">
-                                      <button class="btn btn-sidebar" @click="searchClazz">
+                                  <label for="clazz" class="form-label">Lớp</label>
+                                  <div class="input-group col-md-2" style="margin-bottom: 10px;">
+                                    <input class="input-group rounded-pill" type="search" placeholder="Nhập ID:" aria-label="Search" v-model="searchClazzId" style="padding-left:10px;padding-right:50px;;border: 1px solid #ced4da; box-shadow: 0 0 10px rgba(0,0,0,.1);position: relative;width: 100%;">
+                                    <div class="input-group-append">
+                                      <button class="btn btn-outline-secondary rounded-pill" style="position: absolute;right:15px; border: none;" type="button" @click="searchClazz">
                                         <i class="fas fa-search fa-fw"></i>
                                       </button>
                                     </div>
-                                    <button class="btn btn-info" @click="addClazzId">
-                                      <i class="fas fa-plus"></i>
-                                    </button>
                                   </div>
-                                  <div class="d-flex justify-content-around gap-4">
-                                    <input id="clazzName" type="text" name="clazz" class="form-control col-md-4" v-model="clazz.className" placeholder="Tên lớp">
-                                    <input id="clazzCourseNum" type="text" name="clazz" class="form-control col-md-4" v-model="clazz.courseNum" placeholder="Khóa thứ">
-                                    <input id="clazzStudentNum" type="text" name="clazz" class="form-control col-md-4" v-model="clazz.advisorName" placeholder="Số học sinh">
-                                  </div>
+
+                                      <table class="table co-12" >
+                                        <p v-if="searchClicked && !clazzSearch.id">Không tồn tại lớp mang ID này</p>
+
+                                        <thead>
+                                          <tr>
+                                            <th scope="col">Mã lớp</th>
+                                            <th scope="col">Tên lớp</th>
+                                            <th scope="col">Khóa</th>
+                                            <th scope="col">Năm học</th>
+                                            <th scope="col">Thao tác</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          <tr>
+                                            <td>{{ clazzSearch.id }}</td>
+                                            <td>{{ clazzSearch.className }}</td>
+                                            <td>{{ clazzSearch.courseId }}</td>
+                                            <td>{{ clazzSearch.academicYearId }}</td>
+                                            <td>
+                                              <button class="btn btn-outline-info ml-2" @click="addClazzId" v-if="clazzSearch.id">
+                                                <i class="fas fa-plus"></i>
+                                              </button>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
                                 </div>
                               </div>
                               <div class="row">
                                 <div class="col-md-12 form-group mb-3">
-                                    <label for="clazzId" class="form-label">Chọn lớp</label>
-                                    <input id="clazzId"  type="text" name="clazzId" class="form-control" placeholder="clazzId" required v-model="clazz.className">
+                                    <label for="clazzId" class="form-label">Lớp đã chọn</label>
+                                    <input disabled id="clazzId"  type="text" name="clazzId" class="form-control" placeholder="clazzId" required v-model="clazz.className">
                                 </div>
                               </div>
 
                               <div class="row">
-                                <label for="clazz" class="form-label">Ngành học</label>
-                                <div class="col-md-11 form-group mb-3 d-flex justify-content-between">
-                                  <div class="input-group col-md-3"  data-widget="sidebar-search">
-                                    <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-                                    <div class="input-group-append" style="background-color: antiquewhite;border-radius: 5px; ">
-                                      <button class="btn btn-sidebar" @click="searchMajor">
-                                        <i class="fas fa-search fa-fw"></i>
-                                      </button>
-                                    </div>
-                                    <button class="btn btn-info" @click="addMajorId">
-                                      <i class="fas fa-plus"></i>
-                                    </button>
-                                  </div>
-                                  <div class="d-flex justify-content-around gap-4">
-                                    <input id="major" type="text" name="major" class="form-control col-md-4" placeholder="Tên ngành" v-model="major.majorName">
-                                    <input id="major" type="text" name="major" class="form-control col-md-4" placeholder="Chi tiết xem tại list" disabled >
-                                    <input id="major" type="text" name="major" class="form-control col-md-4" placeholder="Số năm học" v-model="major.yearQuantity">
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="row">
                                 <div class="col-md-12 form-group mb-3">
-                                    <label for="majorId" class="form-label">Chọn ngành</label>
-                                    <input id="majorId"  type="text" name="majorId" class="form-control" placeholder="clazzId" required v-model="major.majorName">
+                                  <label for="majorId" class="form-label">Ngành học</label>
+                                  <select id="majorId" name="majorId" class="form-control" required v-model="student.majorId">
+                                    <option value="">-- Chọn ngành học --</option>
+                                    <option v-for="major in majors" :value="major.id" :key="major.id">
+                                      {{ major.majorName }}
+                                    </option>
+                                  </select>
                                 </div>
                               </div>
 
@@ -213,6 +225,7 @@ import Sidebar from '../components/Sidebar.vue'
 import Navbar from '../components/Navbar.vue' 
 import Footer from '../components/Footer.vue'; 
 import router from '../router';
+import toastr from 'toastr';
 import { useAuthStore } from '../stores/auth';
 
 const access_token = localStorage.getItem('access_token');
@@ -228,30 +241,34 @@ export default {
                 fullName: '',
                   birthDate: '',
                   address: '',
-                  admissionDate: '',
-                  graduationDate: '',
                   gender: '',
                   email: '',
                   phone: '',
+                  cmnd: '',
                   ethnicity: '',
                   gpa: '',
                   status: '',
+                  genderId: '',
                   clazzId: '',
                   majorId: ''
               },
               clazz: {
+                id: '',
                 className: '',
-                courseNum: '',
-                advisorName: '',
-                monitorName: ''
+                courseId: '',
+                academicYearId: '',
               },
-              major: {
-                majorName: '',
-                detail: '',
-                yearQuantity: ''
+              clazzSearch: {
+                id: '',
+                className: '',
+                courseId: '',
+                academicYearId: '',
               },
+              majors: [],
+              genders: [],
               searchClazzId: '' ,
-              searchMajorId: '' 
+              searchMajorId: '' ,
+              searchClicked: false,
           }
       },
       mounted() {
@@ -260,10 +277,39 @@ export default {
       },
 
       methods: { 
+        getGenderData() {
+          fetch(`http://localhost:8080/api/v1/admin/genders/`, {
+                        headers: {
+                            'Authorization': `Bearer ${access_token}` // Use the token here
+                        }
+                    })
+                    .then(res => {
+                        // If the token has expired
+                        if (res.status === 403) {
+                            alert("Token has expired. Please login again.");
+                            useAuthStore().logout();
+                        }
+                        return res;
+                    })
+                  .then(response => {
+                      if (response.ok) {
+                          return response.json();
+                      } else {
+                          throw new Error('Failed to fetch gender data.');
+                      }
+                  })
+                  .then(data => {
+                      this.genders = data;
+                      console.log(data)
+                  })
+                    .catch(error => {
+                        console.log("Error fetching genders!", error);
+                    });
+        },
         getMajorData(getMajorId) {
               getMajorId = this.student.majorId;
-              console.log(access_token);
-              fetch(`http://localhost:8080/api/v1/admin/majors/${getMajorId}`, {
+              console.log("access_token: ",access_token);
+              fetch(`http://localhost:8080/api/v1/admin/majors/list`, {
                         headers: {
                             'Authorization': `Bearer ${access_token}` // Use the token here
                         }
@@ -284,12 +330,7 @@ export default {
                       }
                   })
                   .then(data => {
-                      // Cập nhật thông tin lớp vào clazzData
-                      this.major = {
-                        majorName: data.majorName,
-                        detail: data.detail,
-                        yearQuantity: data.yearQuantity
-                      };
+                      this.majors = data;
                   })
                     .catch(error => {
                         router.replace("/");
@@ -322,10 +363,10 @@ export default {
                   .then(data => {
                       // Cập nhật thông tin lớp vào clazzData
                       this.clazz = {
-                          className: data.className,
-                          courseNum: data.courseNum,
-                          advisorName: data.advisorName,
-                          monitorName: data.monitorName
+                        id: data.id,
+                        className: data.className,
+                        courseId: data.courseId,
+                        academicYearId: data.academicYearId, 
                       };
                   })
                   .catch(error => {
@@ -373,6 +414,8 @@ export default {
             this.student.majorId = parseInt(this.searchMajorId);
           },
           searchClazz() {
+            
+            this.searchClicked = true;
             event.preventDefault();
             fetch(`http://localhost:8080/api/v1/admin/clazzs/search/${this.searchClazzId}`, {
                         headers: {
@@ -395,11 +438,11 @@ export default {
                 }
               })
               .then(data => {
-                this.clazz = {
-                  className: data.className,
-                  courseNum: data.courseNum,
-                  advisorName: data.advisorName,
-                  monitorName: data.monitorName
+                this.clazzSearch = {
+                  id: data.id,
+                        className: data.className,
+                        courseId: data.courseId,
+                        academicYearId: data.academicYearId, 
                 };
               })
               .catch(error => {
@@ -416,6 +459,7 @@ export default {
           },
           getStudentData() {
               // Fetch major data using the major ID from the URL parameter
+
               const studentId = this.$route.params.id;
               fetch(`http://localhost:8080/api/v1/admin/students/${studentId}`, {
                         headers: {
@@ -444,9 +488,8 @@ export default {
                       fullName: data.fullName,
                       birthDate: this.formatDate(data.birthDate),
                       address: data.address,
-                      admissionDate: this.formatDate(data.admissionDate),
-                      graduationDate: this.formatDate(data.graduationDate),
-                      gender: data.gender,
+                      cmnd: data.cmnd,
+                      genderId: data.gender ? data.gender.id : null,
                       email: data.email,
                       phone: data.phone,
                       ethnicity: data.ethnicity,
@@ -458,6 +501,7 @@ export default {
                   console.log(this.student)
                   this.getClazzData(this.student.clazzId);
                   this.getMajorData(this.student.majorId);
+                  this.getGenderData(this.student.genderId);
 
               })
               .catch(error => {
@@ -477,9 +521,10 @@ export default {
                       address: this.student.address,
                       admissionDate: this.student.admissionDate,
                       graduationDate: this.student.graduationDate,
-                      gender: this.student.gender,
+                      genderId: parseInt(this.student.genderId),
                       email: this.student.email,
                       phone: this.student.phone,
+                      cmnd: this.student.cmnd,
                       ethnicity: this.student.ethnicity,
                       gpa: this.student.gpa,
                       status: this.student.status,
@@ -497,11 +542,13 @@ export default {
                     })
               .then(response => {
                   if (response.ok) {
-                      alert("Student updated successfully.");
+                      toastr.success("Student updated successfully.");
                       this.getClazzData();
                       this.$router.replace(`/student/update/${this.student.id}`);
+                      window.scrollTo(0, 0);
+                      toastr("Student updated successfully.");
                   } else {
-                      alert("Failed to update student.");
+                    toastr.error("Failed to update student.");
                       
                   console.log(this.student);
                   }

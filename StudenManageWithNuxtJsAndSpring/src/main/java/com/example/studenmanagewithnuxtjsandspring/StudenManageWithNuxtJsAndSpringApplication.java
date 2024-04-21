@@ -22,11 +22,12 @@ public class StudenManageWithNuxtJsAndSpringApplication {
     }
 
     @Bean
-    CommandLineRunner run(LecturerService lecturerService, GenderService genderService,AcademicYearService academicYearService, AdvisorService advisorService,CourseService courseService ,MajorService majorService, ClazzService clazzService, StudentService studentService, UserService userService, SubjectService subjectService, PointService pointService) {
+    CommandLineRunner run(GradeScaleService gradeScaleService,LecturerService lecturerService, GenderService genderService,AcademicYearService academicYearService, AdvisorService advisorService,CourseService courseService ,MajorService majorService, ClazzService clazzService, StudentService studentService, UserService userService, SubjectService subjectService, PointService pointService) {
         return args -> {
 
             InsertData insertData = new InsertData();
             insertData.addGenders(genderService);
+            insertData.addGradeScale(gradeScaleService);
             insertData.addAdvisors(advisorService);
             insertData.addMajors(majorService);
             insertData.addCourses(courseService);
@@ -37,7 +38,6 @@ public class StudenManageWithNuxtJsAndSpringApplication {
             insertData.addStudents(studentService);
             insertData.addPoints(pointService);
             insertData.addUserRoles(userService);
-
         };
     }
 

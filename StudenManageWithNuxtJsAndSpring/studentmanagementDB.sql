@@ -91,7 +91,8 @@ CREATE TABLE [Point] (
   [finalPoint] float,
   [gpa] float,
   [student_id] int,
-  [subject_id] int
+  [subject_id] int,
+    [gradeScale_id] int
 )
 GO
 
@@ -115,6 +116,15 @@ CREATE TABLE [User_Role] (
   [role_id] int
 )
 GO
+
+CREATE TABLE GradeScale (
+    [id] int PRIMARY KEY IDENTITY(1, 1),
+    [grade] CHAR(2),
+    [min_gpa] FLOAT,
+    [max_gpa] FLOAT
+);
+
+Alter Table [Point] Add FOREIGN KEY ([gradeScale_id]) REFERENCES [GradeScale] ([id])
 
 ALTER TABLE [Clazz] ADD FOREIGN KEY ([academicYear_id]) REFERENCES [academicYear] ([id])
 GO
