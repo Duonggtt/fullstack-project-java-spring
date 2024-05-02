@@ -65,7 +65,7 @@
                                               <a :href="`/clazz/update/${clazz.id}`" type="button" class="btn btn-success">
                                                   <i class="fas fa-search"></i>
                                               </a>
-                                              <a  @click="deleteClazz(clazz.id)" type="button" class="btn btn-success" style="background-color: tomato;" >
+                                              <a  @click="deleteClazz(clazz.id)" type="button" class="btn btn-success" style="background-color: tomato;margin-left: 10px;" >
                                                   <i class="fas fa-trash"></i>
                                               </a>
                                           </td>
@@ -106,7 +106,7 @@ import Pagination from '../components/Pagination.vue';
 import Footer from '../components/Footer.vue'; 
 import router from '../router';
 import { useAuthStore } from '../stores/auth';
-
+import toastr from 'toastr';
 const access_token = localStorage.getItem('access_token');
     export default {
         name: 'ViewClazzs',
@@ -139,7 +139,7 @@ const access_token = localStorage.getItem('access_token');
                     .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn.");
                             useAuthStore().logout();
                         }
                         return res;
@@ -153,7 +153,6 @@ const access_token = localStorage.getItem('access_token');
                     .catch(error => {
                         router.replace("/");
                         console.log("Error fetching class list!", error);
-                        toastr.error('Authorization!');
                     });
             },
             changePage(pageNumber) {
@@ -183,11 +182,11 @@ const access_token = localStorage.getItem('access_token');
                     })
                     .then(data => {
                         console.log(data)
-                        alert("Class deleted successfully.");
+                        toastr.success("Class deleted successfully.");
                         this.getClazzs()
                     })
                 }else {
-                    alert("Delete operation cancelled.");
+                    toastr.error("Delete operation cancelled.");
                 }
             }
         }

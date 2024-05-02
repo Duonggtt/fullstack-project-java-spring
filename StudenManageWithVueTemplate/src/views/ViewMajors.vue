@@ -65,7 +65,7 @@
                                               <a :href="`/major/update/${major.id}`" type="button" class="btn btn-success">
                                                   <i class="fas fa-search"></i>
                                               </a>
-                                              <a  @click="deleteMajor(major.id)" type="button" class="btn btn-success" style="background-color: tomato;" >
+                                              <a  @click="deleteMajor(major.id)" type="button" class="btn btn-success" style="background-color: tomato;margin-left: 10px;" >
                                                   <i class="fas fa-trash"></i>
                                               </a>
                                           </td>
@@ -105,6 +105,7 @@ import Navbar from '../components/Navbar.vue'
 import Pagination from '../components/Pagination.vue'; 
 import Footer from '../components/Footer.vue';
 import router from '../router';
+import toastr from 'toastr';
 import { useAuthStore } from '../stores/auth';
 
 const access_token = localStorage.getItem('access_token');
@@ -139,7 +140,7 @@ const access_token = localStorage.getItem('access_token');
                     .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn.");
                             useAuthStore().logout();
                         }
                         return res;
@@ -153,7 +154,6 @@ const access_token = localStorage.getItem('access_token');
                     .catch(error => {
                         router.replace("/");
                         console.log("Error fetching major list!", error);
-                        toastr.error('Authorization!');
                     });
             },
             changePage(pageNumber) {
@@ -183,11 +183,11 @@ const access_token = localStorage.getItem('access_token');
                     })
                     .then(data => {
                         console.log(data)
-                        alert("Major deleted successfully.");
+                        toastr.success("Major deleted successfully.");
                         this.getMajors()
                     })
                 }else {
-                    alert("Delete operation cancelled.");
+                    toastr.error("Delete operation cancelled.");
                 }
             }
         }

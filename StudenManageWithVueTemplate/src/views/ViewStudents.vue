@@ -68,7 +68,7 @@
                                             {{ student.major ? student.major.majorName : 'Chưa chọn ngành' }}
                                           </td>
                                           <td>{{ student.gender.genderName }}</td>
-                                          <td :class="{ 'text-danger': !student.clazz, 'text-success': student.clazz }">
+                                          <td :class="{ 'text-danger': !student.clazz, 'text-info': student.clazz }">
                                             {{ student.clazz ? student.clazz.className : 'Chưa có lớp' }}
                                         </td>
                                         <td>
@@ -154,7 +154,7 @@ import { useAuthStore } from '../stores/auth';
                     .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn.");
                             useAuthStore().logout();
                         }
                         return res;
@@ -173,7 +173,6 @@ import { useAuthStore } from '../stores/auth';
                     .catch(error => {
                         router.replace("/");
                         console.log("Error fetching student list!", error);
-                        toastr.error('Authorization!');
                     });
             },
             changePage(pageNumber) {
@@ -197,17 +196,30 @@ import { useAuthStore } from '../stores/auth';
                 }
             },
             deleteStudent(id){
+                const access_token = localStorage.getItem('access_token');      
+                const url = `http://localhost:8080/api/v1/admin/students/${id}`;
                 if (confirm("Are you sure you want to delete this student?")) {
-                    fetch(`http://localhost:8080/api/v1/admin/students/${id}`, {
-                    method: 'DELETE'
+                    fetch(url , {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${access_token}` // Use the token here
+                        }
+                    })
+                    .then(res => {
+                        // If the token has expired
+                        if (res.status === 403) {
+                            toastr.error("Phiên đăng nhập hết hạn.");
+                            useAuthStore().logout();
+                        }
+                        return res;
                     })
                     .then(data => {
                         console.log(data)
-                        alert("Student deleted successfully.");
+                        toastr.success("Student deleted successfully.");
                         this.getStudents()
                     })
                 }else {
-                    alert("Delete operation cancelled.");
+                    toastr.error("Delete operation cancelled.");
                 }
             },
             formatDate(date) {
@@ -220,7 +232,7 @@ import { useAuthStore } from '../stores/auth';
             switch (status) {
                 case 'Đang học':
                     return 'text-success'; // Màu xanh
-                case 'Bỏ học':
+                case 'Thôi học':
                     return 'text-danger'; // Màu đỏ
                 case 'Bảo lưu':
                     return 'text-warning'; // Màu vàng

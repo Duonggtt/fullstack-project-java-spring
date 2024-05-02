@@ -14,8 +14,6 @@
             useAuthStore().login(user.username, user.password);
         }
     }
-
-      
   </script>
 
 <template>

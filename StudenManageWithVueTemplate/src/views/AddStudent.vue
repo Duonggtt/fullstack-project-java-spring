@@ -160,6 +160,7 @@ import Navbar from '../components/Navbar.vue'
 import Footer from '../components/Footer.vue';
 import router from '../router'; 
 import { useAuthStore } from '../stores/auth';
+import toastr from 'toastr';
 
 const access_token = localStorage.getItem('access_token');
 export default {
@@ -197,22 +198,21 @@ export default {
               .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn.");
                             useAuthStore().logout();
                         }
                         return res;
                     })
               .then(response => {
                   if (response.ok) {
-                      alert("Student added successfully.");
+                      toastr.success("Student added successfully.");
                       this.$router.push("/student/list");
                   } else {
-                      alert("Failed to add student.");
+                      toastr.error("Failed to add student.");
                   }
               })
                     .catch(error => {
                         router.replace("/");
-                        toastr.error('Authorization!');
                     });
 
           }

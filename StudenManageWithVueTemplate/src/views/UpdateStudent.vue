@@ -133,6 +133,9 @@
                                               <button class="btn btn-outline-info ml-2" @click="addClazzId" v-if="clazzSearch.id">
                                                 <i class="fas fa-plus"></i>
                                               </button>
+                                              <button class="btn btn-outline-danger ml-2" @click="removeInfo" v-if="clazzSearch.id">
+                                                <i class="fas fa-trash"></i>
+                                              </button>
                                             </td>
                                           </tr>
                                         </tbody>
@@ -180,10 +183,14 @@
                               </div>
 
                               <div class="row">
-                                <div class="col-md-12 form-group mb-3">
-                                    <label for="status" class="form-label">Trạng thái</label>
-                                    <input id="status"  type="text" name="status" class="form-control" placeholder="Trạng thái" required v-model="student.status">
-                                </div>
+                                  <div class="col-md-12 form-group mb-3">
+                                      <label for="status" class="form-label">Trạng thái</label>
+                                      <select id="status" name="status" class="form-control" required v-model="student.status">
+                                          <option value="Đang học">Đang học</option>
+                                          <option value="Bảo lưu">Bảo lưu</option>
+                                          <option value="Thôi học">Thôi học</option>
+                                      </select>
+                                  </div>
                               </div>
                   
                               <div class="row">
@@ -286,7 +293,7 @@ export default {
                     .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn.");
                             useAuthStore().logout();
                         }
                         return res;
@@ -317,7 +324,7 @@ export default {
                     .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn.");
                             useAuthStore().logout();
                         }
                         return res;
@@ -335,7 +342,6 @@ export default {
                     .catch(error => {
                         router.replace("/");
                         console.log("Error fetching student!", error);
-                        toastr.error('Authorization!');
                     });
           }, 
           getClazzData(getClazzId) {
@@ -348,7 +354,7 @@ export default {
                     .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn.");
                             useAuthStore().logout();
                         }
                         return res;
@@ -370,7 +376,7 @@ export default {
                       };
                   })
                   .catch(error => {
-                      console.error('Error fetching class data:', error);
+                      toastr.error('Error fetching class data:', error);
                   });
           },
           searchMajor() {
@@ -383,7 +389,7 @@ export default {
                     .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn.");
                             useAuthStore().logout();
                         }
                         return res;
@@ -403,56 +409,62 @@ export default {
                 };
               })
               .catch(error => {
-                console.error('Error fetching major data:', error);
+                toastr.error('Error fetching major data:', error);
               });
           },
           addMajorId() {
             if (!this.searchMajorId) {
-              alert("Vui lòng nhập ID của major trước khi thêm.");
+              toastr.warning("Vui lòng nhập ID của major trước khi thêm.");
               return;
             }
             this.student.majorId = parseInt(this.searchMajorId);
           },
           searchClazz() {
-            
             this.searchClicked = true;
             event.preventDefault();
             fetch(`http://localhost:8080/api/v1/admin/clazzs/search/${this.searchClazzId}`, {
-                        headers: {
-                            'Authorization': `Bearer ${access_token}` // Use the token here
-                        }
-                    })
-                    .then(res => {
-                        // If the token has expired
-                        if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
-                            useAuthStore().logout();
-                        }
-                        return res;
-                    })
-              .then(response => {
-                if (response.ok) {
-                  return response.json();
-                } else {
-                  throw new Error('Failed to fetch class data.');
-                }
-              })
-              .then(data => {
-                this.clazzSearch = {
-                  id: data.id,
-                        className: data.className,
-                        courseId: data.courseId,
-                        academicYearId: data.academicYearId, 
-                };
-              })
-              .catch(error => {
-                console.error('Error fetching class data:', error);
-              });
+              headers: {
+                'Authorization': `Bearer ${access_token}` // Use the token here
+              }
+            })
+            .then(res => {
+              // If the token has expired
+              if (res.status === 403) {
+                toastr.error("Phiên đăng nhập hết hạn.");
+                useAuthStore().logout();
+              }
+              if (res.status === 404) {
+                // If the clazz is not found, reject the Promise without throwing an error
+                return Promise.reject('Clazz not found');
+              }
+              return res;
+            })
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error('Failed to fetch class data.');
+              }
+            })
+            .then(data => {
+              this.clazzSearch = {
+                id: data.id,
+                className: data.className,
+                courseId: data.courseId,
+                academicYearId: data.academicYearId, 
+              };
+            })
+            .catch(error => {
+              if (error !== 'Clazz not found') {
+                toastr.error('Error fetching class data:');
+              }
+              this.clazzSearch = {}; 
+            });
           },
            // Hàm thêm thông tin ID của clazz
           addClazzId() {
             if (!this.searchClazzId) {
-              alert("Vui lòng nhập ID của clazz trước khi thêm.");
+              toastr.warning("Vui lòng nhập ID của clazz trước khi thêm.");
               return;
             }
             this.student.clazzId = parseInt(this.searchClazzId);
@@ -469,7 +481,7 @@ export default {
                     .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn.");
                             useAuthStore().logout();
                         }
                         return res;
@@ -505,7 +517,7 @@ export default {
 
               })
               .catch(error => {
-                  console.error('Error fetching student data:', error);
+                  toastr.error('Error fetching student data:');
               });
           },
           updateStudent() {
@@ -535,26 +547,23 @@ export default {
               .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn.");
                             useAuthStore().logout();
                         }
                         return res;
                     })
               .then(response => {
                   if (response.ok) {
-                      toastr.success("Student updated successfully.");
                       this.getClazzData();
                       this.$router.replace(`/student/update/${this.student.id}`);
                       window.scrollTo(0, 0);
-                      toastr("Student updated successfully.");
+                      toastr.success("Student updated successfully.");
                   } else {
                     toastr.error("Failed to update student.");
-                      
-                  console.log(this.student);
                   }
               })
               .catch(error => {
-                  console.error("Error updating student:", error);
+                console.log("Error updating student:", error.message);
               });
           },
           formatDate(dateString) {

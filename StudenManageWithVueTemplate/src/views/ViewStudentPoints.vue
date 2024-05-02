@@ -16,12 +16,12 @@
           <div class="container-fluid">
             <div class="row mb-2">
               <div class="col-sm-6">
-                <h1 class="m-0">Danh sách sinh viên</h1>
+                <h1 class="m-0">Danh sách điểm</h1>
               </div><!-- /.col -->
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                  <li class="breadcrumb-item"><a href="/">Home</a></li>
-                  <li class="breadcrumb-item active">Danh sách sinh viên</li>
+                  <li class="breadcrumb-item"><a href="/student/list">Home</a></li>
+                  <li class="breadcrumb-item active">Danh sách điểm</li>
                 </ol>
               </div><!-- /.col -->
             </div><!-- /.row -->
@@ -58,31 +58,29 @@
                                       </tr>
                                   </thead>
                                   <tbody>
-                                      <tr v-for="student in students" :key="student.id">
-                                          <td>{{ student.id }}</td>
-                                          <td><p class="text-warning">{{ student.fullName }}</p></td>
-                                          <td>{{ formatDate(student.birthDate) }}</td>
-                                          <td>{{ student.address }}</td>
-                                          <td>
-                                            {{ student.major ? student.major.majorName : 'Chưa chọn ngành' }}
-                                          </td>
-                                          <td>{{ student.gender.genderName }}</td>
-                                          <td :class="{ 'text-danger': !student.clazz, 'text-success': student.clazz }">
-                                            {{ student.clazz ? student.clazz.className : 'Chưa có lớp' }}
-                                        </td>
+                                      <tr v-for="point in points" :key="point.id">
+                                          <td>{{ point.subject.id }}</td>
+                                          <td><p class="text-warning">{{ point.subject.name }}</p></td>
+                                          <td>{{ point.diligencePoint  }}</td>
+                                          <td>{{ point.midTermPoint  }}</td>
+                                          <td>{{ point.finalPoint  }}</td>
+                                          <td>{{ point.gpa  }}</td>
+                                          <td><p :class="{
+                                            'text-success': point.gradeScale.grade === 'A',
+                                            'text-info': point.gradeScale.grade === 'B',
+                                            'text-warning': point.gradeScale.grade === 'C',
+                                            'text-danger': ['A', 'B', 'C'].indexOf(point.gradeScale.grade) === -1
+                                            }">{{ point.gradeScale.grade }}</p></td>
+                                          
 
                                           <td>
-                                              <a :href="`/student/update/${student.id}`" type="button" class="btn btn-success">
+                                              <a :href="`/point/update/${point.id}`" type="button" class="btn btn-success">
                                                   <i class="fas fa-search"></i>
                                               </a>
                                           </td>
                                       </tr>
                                   </tbody>
                               </table>
-
-                              <!-- pagination -->
-                              <Pagination :currentPage="currentPage" :totalPages="totalPages" :prevPage="prevPage" :nextPage="nextPage" :changePage="changePage" />
-                              
                           </div>
                       </div>
                   </div>
@@ -117,7 +115,7 @@ import { useAuthStore } from '../stores/auth';
 
 
     export default {
-        name: 'ViewStudents',
+        name: 'ViewStudentPoints',
         components: {
             Sidebar,Navbar,Pagination,Footer
         },
@@ -126,18 +124,19 @@ import { useAuthStore } from '../stores/auth';
                 currentPage: 1,
                 totalPages: 1,
                 pageSize: 10,
-                students: []
+                points: [],
             }
         },
 
         beforeMount(){
-            this.getStudents()
+            this.getPointsByStudent();
         },
 
         methods: {
-            getStudents() {
+            getPointsByStudent() {
                 const access_token = localStorage.getItem('access_token');
-                const url = `http://localhost:8080/api/v1/admin/students/?page=${this.currentPage}&limit=${this.pageSize}`;
+                const studentId = this.$route.params.id;
+                const url = `http://localhost:8080/api/v1/admin/points/student/${studentId}`;
 
                 fetch(url, {
                         headers: {
@@ -147,7 +146,7 @@ import { useAuthStore } from '../stores/auth';
                     .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn.");
                             useAuthStore().logout();
                         }
                         return res;
@@ -159,68 +158,15 @@ import { useAuthStore } from '../stores/auth';
                         return res.json();
                     })
                     .then(data => {
-                        this.students = data.content;
-                        this.totalPages = data.totalPages;
-                        console.log(data);
+                        this.points = data;
+                        console.log(this.points);
                     })
                     .catch(error => {
                         router.replace("/");
-                        console.log("Error fetching student list!", error);
-                        toastr.error('Authorization!');
+                        console.log("Error fetching student point list!", error);
                     });
             },
-            changePage(pageNumber) {
-                if (pageNumber >= 1 && pageNumber <= this.totalPages) {
-                    this.currentPage = pageNumber;
-                    this.getStudents();
-                }
-            },
             
-            nextPage() {
-                if (this.currentPage < this.totalPages) {
-                    this.currentPage++;
-                    this.getStudents();
-                }
-            },
-            
-            prevPage() {
-                if (this.currentPage > 1) {
-                    this.currentPage--;
-                    this.getStudents();
-                }
-            },
-            deleteStudent(id){
-                if (confirm("Are you sure you want to delete this student?")) {
-                    fetch(`http://localhost:8080/api/v1/admin/students/${id}`, {
-                    method: 'DELETE'
-                    })
-                    .then(data => {
-                        console.log(data)
-                        alert("Student deleted successfully.");
-                        this.getStudents()
-                    })
-                }else {
-                    alert("Delete operation cancelled.");
-                }
-            },
-            formatDate(date) {
-                const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-                const formattedDate = new Date(date).toLocaleDateString('en-US', options);
-                const [month, day, year] = formattedDate.split('/');
-                return `${day}/${month}/${year}`;
-            },
-            getStatusColor(status) {
-            switch (status) {
-                case 'Đang học':
-                    return 'text-success'; // Màu xanh
-                case 'Bỏ học':
-                    return 'text-danger'; // Màu đỏ
-                case 'Bảo lưu':
-                    return 'text-warning'; // Màu vàng
-                default:
-                    return ''; // Mặc định không áp dụng lớp màu
-            }
-        },
         }
 
     }

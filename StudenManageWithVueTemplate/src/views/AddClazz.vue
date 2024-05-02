@@ -118,6 +118,7 @@ import Navbar from '../components/Navbar.vue'
 import Footer from '../components/Footer.vue'; 
 import router from '../router';
 import { useAuthStore } from '../stores/auth';
+import toastr from 'toastr';
 
 const access_token = localStorage.getItem('access_token');
 export default {
@@ -150,22 +151,21 @@ export default {
                 .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn!");
                             useAuthStore().logout();
                         }
                         return res;
                     })
                 .then(response => {
                     if (response.ok) {
-                        alert("Class added successfully.");
+                        toastr.success("Class added successfully.");
                         this.$router.replace("/clazz/list");
                     } else {
-                        alert("Failed to add class.");
+                        toastr.error("Failed to add class.");
                     }
                 })
                     .catch(error => {
                         router.replace("/");
-                        toastr.error('Authorization!');
                     });
 
             }

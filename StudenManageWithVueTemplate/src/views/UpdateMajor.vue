@@ -119,6 +119,7 @@ import Sidebar from '../components/Sidebar.vue'
 import Navbar from '../components/Navbar.vue' 
 import Footer from '../components/Footer.vue'; 
 import router from '../router';
+import toastr from 'toastr';
 
 import { useAuthStore } from '../stores/auth';
 const access_token = localStorage.getItem('access_token');
@@ -154,7 +155,7 @@ export default {
                     .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn.");
                             useAuthStore().logout();
                         }
                         return res;
@@ -178,7 +179,6 @@ export default {
                     .catch(error => {
                         router.replace("/");
                         console.log("Error fetching major!", error);
-                        toastr.error('Authorization!');
                     });
             },
             updateMajor() {
@@ -193,17 +193,17 @@ export default {
                 .then(res => {
                         // If the token has expired
                         if (res.status === 403) {
-                            alert("Token has expired. Please login again.");
+                            toastr.error("Phiên đăng nhập hết hạn.");
                             useAuthStore().logout();
                         }
                         return res;
                     })
                 .then(response => {
                     if (response.ok) {
-                        alert("Major updated successfully.");
+                        toastr.success("Major updated successfully.");
                         this.$router.replace("/major/list");
                     } else {
-                        alert("Failed to update major.");
+                        toastr.error("Failed to update major.");
                     }
                 })
                 .catch(error => {
